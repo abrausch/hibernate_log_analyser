@@ -1,0 +1,5 @@
+= hibernate_log_analyser
+
+Generate this with
+    hibernate_log_analyser rdoc
+After you have described your command line interface

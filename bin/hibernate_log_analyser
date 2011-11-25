@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+# 1.9 adds realpath to resolve symlinks; 1.8 doesn't
+# have this method, so we add it so we get resolved symlinks
+# and compatibility
+unless File.respond_to? :realpath
+  class File #:nodoc:
+    def self.realpath path
+      return realpath(File.readlink(path)) if symlink?(path)
+      path
+    end
+  end
+end
+$: << File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib')
+require 'rubygems'
+require 'gli'
+require 'digest/sha1'
+require 'hibernate_log_analyser_version'
+
+include GLI
+
+program_desc 'Analyse hibernate log output, count the execution of equal statements'
+
+version HibernateLogAnalyser::VERSION
+
+desc 'Seperator of the logfile. This normally depends on the language settings. For example FINE in english and FEIN in german'
+default_value 'FINE'
+arg_name 'seperator'
+flag [:s,:seperator]
+
+desc 'File to write the output to'
+default_value 'STDOUT'
+arg_name 'filename'
+flag [:o,:out]
+
+desc 'Analyse the logfile'
+arg_name 'Name of the hibernate sql log file'
+command :analyse do |c|        
+  c.action do |global_options,options,args|
+    if args.length < 1
+      raise 'You must specify the name of the hibernate sql file'
+    end
+    
+    # Hash to save the count per statement. Key is sha1 build from statement text.
+    count_hash = Hash.new()
+    
+    # Hash to save the statement. Key is sha1 build from statement text.
+    statement_hash = Hash.new()
+    
+    File.open(args[0], 'r') do |file|
+      file.readlines.each do |line|
+        if line.include? global_options[:s]
+          hash = Digest::SHA1.hexdigest line
+          key = hash.to_sym
+          if count_hash.has_key? key
+            value = count_hash[key]
+            value = value + 1
+            count_hash[key] = value
+          else
+            count_hash[key] = 1
+            statement_hash[key] = line
+          end
+        end
+      end
+    end
+    
+    if global_options[:o] != "STDOUT"
+      STDOUT.reopen(File.open(global_options[:o], 'w+'))
+    end
+    
+    # Sorting the count hash
+    sorted_count = count_hash.sort {|a,b| a[1] <=> b[1]}
+    total = 0
+
+    sorted_count.each {|x| 
+      STDOUT.puts "#{x[1]}  -- #{statement_hash[x[0]]}"
+      total = total + x[1].to_i
+    }
+
+    STDOUT.puts "----------"
+    STDOUT.puts total        
+  end
+end
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+exit GLI.run(ARGV)

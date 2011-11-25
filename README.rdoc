@@ -1,0 +1,6 @@
+= hibernate_log_analyser
+
+Describe your project here
+
+:include:hibernate_log_analyser.rdoc
+
