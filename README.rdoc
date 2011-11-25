@@ -1,6 +1,5 @@
-= hibernate_log_analyser
+= Analyse hibernate sql output
 
-Describe your project here
+With this small script you can count equal sql statements in yout hibernate sql logging file: This can be usefull for examine performance problems
 
-:include:hibernate_log_analyser.rdoc
 
