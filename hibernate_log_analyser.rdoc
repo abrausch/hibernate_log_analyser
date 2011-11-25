@@ -1,5 +1,33 @@
-= hibernate_log_analyser
+= <tt>hibernate_log_analyser</tt>
 
-Generate this with
-    hibernate_log_analyser rdoc
-After you have described your command line interface
+Analyse hibernate log output, count the execution of equal statements
+
+    hibernate_log_analyser [global options] command_name [command-specific options] [--] arguments...
+
+* Use the command +help+ to get a summary of commands
+* Use the command <tt>help command_name</tt> to get a help for +command_name+
+* Use <tt>--</tt> to stop command line argument processing; useful if your arguments have dashes in them
+
+== Global Options
+These options are available for any command and are specified before the name of the command
+
+[<tt>-o, --out=filename</tt>] File to write the output to <i>( default: <tt>STDOUT</tt>)</i>
+[<tt>-s, --seperator=seperator</tt>] Seperator of the logfile. This normally depends on the language settings. For example FINE in english and FEIN in german <i>( default: <tt>FINE</tt>)</i>
+== Commands
+[<tt>analyse</tt>] Analyse the logfile
+[<tt>help</tt>] Shows list of commands or help for one command
+
+=== <tt>analyse Name of the hibernate sql log file</tt>
+
+Analyse the logfile
+
+=== <tt>help [command]</tt>
+
+Shows list of commands or help for one command
+
+Gets help for the application or its commands.  Can also list the commands in a way helpful to creating a bash-style completion function
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
